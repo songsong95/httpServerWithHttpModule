@@ -1,9 +1,8 @@
-const { json } = require("express");
+//const { json } = require("express");
 const http = require("http");
-const { title } = require("process");
+//const { title } = require("process");
 const server = http.createServer();
-const util = require("util");
-//const patch = require("patch-package");
+const fs = require("fs");
 
 const users = [
   {
@@ -102,7 +101,33 @@ const httpRequestListener = function (request, response) {
           id: post.id,
           title: post.title,
           content: post.content,
-          userId: post.userId,
+          userId: post.userId, // else if (method === "DELETE") {
+          //   if (url === "/delete") {
+          //     let body = "";
+
+          //     request.on("data", (data) => {
+          //       body += data;
+          //     });
+
+          //     request.on("end", () => {
+          //       const post = JSON.parse(body);
+
+          //       posts.push({
+          //         id: post.id,
+          //         title: post.title,
+          //         content: post.content,
+          //         userId: post.userId,
+          //       });
+          //       response.writeHead(200, { "Content-Type": "application/json" });
+          //       response.end({ message: "삭제 전", data: posts });
+          //     });
+
+          //     fs.unlink(`data/${"/delete"}`, function (error) {
+          //       response.writeHead(200, { Location: `/` });
+          //       response.end(JSON.stringify({ message: "postingDeleted" }));
+          //     });
+          //   }
+          // }
         });
         response.writeHead(200, { "Content-Type": "application/json" });
         response.end(JSON.stringify({ message: "postCreated", data: posts }));
@@ -117,12 +142,41 @@ const httpRequestListener = function (request, response) {
       });
 
       request.on("end", () => {
-        //const post = JSON.parse(body);
+        const post = JSON.parse(body);
         const arr = [];
+
         arr.push(forLoop());
 
         response.writeHead(200, { "Content-Type": "application/json" });
         response.end(JSON.stringify({ message: "수정 완료!", data: arr }));
+      });
+    }
+  } else if (method === "DELETE") {
+    if (url === "/delete") {
+      let body = "";
+
+      request.on("data", (data) => {
+        body += data;
+      });
+
+      request.on("end", () => {
+        const post = JSON.parse(body);
+
+        for (let i = 0; posts.length; i++) {
+          if (posts[i].id === post.id) {
+            posts.splice(i, 1);
+            break;
+          }
+        }
+
+        // posts.push({
+        //   id: post.id,
+        //   title: post.title,
+        //   content: post.content,
+        //   userId: post.userId,
+        // });
+        response.writeHead(200, { "Content-Type": "application/json" });
+        response.end(JSON.stringify({ message: "삭제 전", data: posts }));
       });
     }
   }
